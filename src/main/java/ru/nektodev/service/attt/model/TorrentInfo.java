@@ -1,5 +1,7 @@
 package ru.nektodev.service.attt.model;
 
+import org.springframework.data.annotation.Id;
+
 import java.io.Serializable;
 
 /**
@@ -7,6 +9,7 @@ import java.io.Serializable;
  * @date 16/10/2016
  */
 public class TorrentInfo implements Serializable {
+    @Id
     private String url;
     private String magnet;
 
