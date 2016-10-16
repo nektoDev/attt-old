@@ -5,19 +5,36 @@ buildscript {
 	repositories {
         mavenLocal()
 		mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.9.0"
 	}
 }
 
+plugins {
+    id "net.vivin.gradle-semantic-build-versioning" version "2.0.2"
+}
+
+
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
+apply plugin: "com.palantir.docker"
+
+docker {
+    name "nektodev/attt"
+    tags 'latest'
+    dockerfile 'docker/Dockerfile'
+    dependsOn tasks.jar, tasks.bootRepackage
+    pull true
+}
+
 
 jar {
 	baseName = 'attt'
-	version = '0.0.1-SNAPSHOT'
 }
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -36,4 +53,45 @@ dependencies {
 //	compile group: 'nl.stil4m', name: 'transmission-rpc-java', version: '0.6.0-SNAPSHOT'
     compile files('./libs/transmission-rpc-java-0.6.0-SNAPSHOT')
 
+}
+
+project.version.with {
+    tagPrefix="v"
+}
+
+task releaseMajor(dependsOn: ['clean', 'bumpMajor', 'release', 'docker']) << {
+    println "Release ${project.name} version: ${project.version}"
+}
+
+task releaseMinor(dependsOn: ['clean', 'bumpMinor', 'release', 'docker']) << {
+    println "Release ${project.name} version: ${project.version}"
+}
+
+task releasePatch(dependsOn: ['clean', 'bumpPatch', 'release', 'docker']) << {
+    println "Release ${project.name} version: ${project.version}"
+}
+
+task dockerTagAndPush << {
+    dockerTag.execute()
+
+    exec {
+        commandLine "docker", "tag", "${docker.name}:latest", "${docker.name}:v${project.version}"
+    }
+
+    dockerPush.execute()
+}
+
+releasePatch.doLast {
+    dockerTagAndPush.execute()
+    tag.execute()
+}
+
+releaseMinor.doLast {
+    dockerTagAndPush.execute()
+    tag.execute()
+}
+
+releaseMajor.doLast {
+    dockerTagAndPush.execute()
+    tag.execute()
 }
