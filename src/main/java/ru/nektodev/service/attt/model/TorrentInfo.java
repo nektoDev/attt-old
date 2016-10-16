@@ -12,6 +12,8 @@ public class TorrentInfo implements Serializable {
     @Id
     private String url;
     private String magnet;
+    private String downloadDir;
+    private String name;
 
     public String getUrl() {
         return url;
@@ -27,5 +29,17 @@ public class TorrentInfo implements Serializable {
 
     public void setMagnet(String magnet) {
         this.magnet = magnet;
+    }
+
+    public String getDownloadDir() {
+        return downloadDir;
+    }
+
+    public void setDownloadDir(String downloadDir) {
+        this.downloadDir = downloadDir;
+    }
+
+    public String getName() {
+        return name;
     }
 }

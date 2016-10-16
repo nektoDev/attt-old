@@ -12,6 +12,7 @@ import ru.nektodev.service.attt.model.TorrentInfo;
 import ru.nektodev.service.attt.repository.TorrentInfoRepository;
 
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * @author nektodev
@@ -25,8 +26,11 @@ public class TorrentCheckScheduler {
     @Autowired
     private TorrentInfoRepository torrentInfoRepository;
 
+    @Autowired
+    TransmissionService transmissionService;
+
 //    @Scheduled(cron="${scheduler.import.cron}")
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(cron="${scheduler.import.cron}")
     public void checkTorrent() throws IOException {
         LOG.info("Start scheduled check.");
         for (TorrentInfo torrentInfo : torrentInfoRepository.findAll()) {
@@ -34,8 +38,16 @@ public class TorrentCheckScheduler {
             Elements elements = doc.select("a");
             elements.attr("href");
             for (Element element : elements) {
-                if (isMagnet(element) && !element.attr("href").equalsIgnoreCase(torrentInfo.getMagnet())) {
-                    System.out.println(element.attr("href"));
+                String magnet = element.attr("href");
+                if (isMagnet(element) && !magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
+                    System.out.println("New torrent for: " + torrentInfo.getName());
+                    if (transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet)) {
+                        System.out.println("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
+                        torrentInfo.setMagnet(magnet);
+                        torrentInfoRepository.save(Collections.singletonList(torrentInfo));
+                    } else {
+                        System.out.println("Error while add torrent: " + torrentInfo.getName());
+                    }
                 }
             }
 
