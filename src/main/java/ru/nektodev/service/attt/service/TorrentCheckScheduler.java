@@ -39,18 +39,19 @@ public class TorrentCheckScheduler {
             elements.attr("href");
             for (Element element : elements) {
                 String magnet = element.attr("href");
-                if (isMagnet(element) && !magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
-                    System.out.println("New torrent for: " + torrentInfo.getName());
-                    if (transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet)) {
-                        System.out.println("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
-                        torrentInfo.setMagnet(magnet);
-                        torrentInfoRepository.save(Collections.singletonList(torrentInfo));
+                if (isMagnet(element)) {
+                    if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
+                        System.out.println("New torrent for: " + torrentInfo.getName());
+                        if (transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet)) {
+                            System.out.println("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
+                            torrentInfo.setMagnet(magnet);
+                            torrentInfoRepository.save(Collections.singletonList(torrentInfo));
+                        } else {
+                            System.out.println("Error while add torrent: " + torrentInfo.getName());
+                        }
                     } else {
-                        System.out.println("Error while add torrent: " + torrentInfo.getName());
+                        System.out.println("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
                     }
-                } else {
-                    System.out.println("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
-                }
             }
 
         }
