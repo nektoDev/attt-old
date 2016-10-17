@@ -25,32 +25,47 @@ public class TransmissionService {
         client = new DefaultHttpClient();
     }
 
-    public boolean addToTransmission(String downloadDir, String magnet) throws IOException {
-        URL obj = new URL(TRANSMISSION_URL);
+    public boolean addToTransmission(String downloadDir, String magnet) {
+        try {
+            URL obj = new URL(TRANSMISSION_URL);
 
-        HttpPost post = new HttpPost(TRANSMISSION_URL);
-        post.addHeader("X-Transmission-Session-Id", getSession());
-        String body = "{\n" +
-                "\t\"method\" : \"torrent-add\",\n" +
-                "\t\"arguments\" : {\n" +
-                "\t\t\"filename\":\"" + magnet + "\",\n" +
-                "\t\t\"download-dir\": \""+ downloadDir +"\" \n" +
-                "\t}\n" +
-                "}";
-        StringEntity params = new StringEntity(body);
-        post.setEntity(params);
-        HttpResponse response = client.execute(post);
 
-        int responseCode = response.getStatusLine().getStatusCode();
+            HttpPost post = new HttpPost(TRANSMISSION_URL);
+            post.addHeader("X-Transmission-Session-Id", getSession());
+            String body = "{\n" +
+                    "\t\"method\" : \"torrent-add\",\n" +
+                    "\t\"arguments\" : {\n" +
+                    "\t\t\"filename\":\"" + magnet + "\",\n" +
+                    "\t\t\"download-dir\": \"" + downloadDir + "\" \n" +
+                    "\t}\n" +
+                    "}";
+            StringEntity params = new StringEntity(body);
+            post.setEntity(params);
+            HttpResponse response = client.execute(post);
 
-        System.out.println("[" + responseCode + "]");
+            int responseCode = response.getStatusLine().getStatusCode();
 
-        return 200 == responseCode;
+            System.out.println("[" + responseCode + "]");
+
+            return 200 == responseCode;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            client.getConnectionManager().shutdown();
+        }
     }
 
-    private String getSession() throws IOException {
+    private String getSession() {
         HttpPost post = new HttpPost(TRANSMISSION_URL);
-        HttpResponse response = client.execute(post);
-        return response.getFirstHeader("X-Transmission-Session-Id").getValue();
+        try {
+            HttpResponse response = client.execute(post);
+            return response.getFirstHeader("X-Transmission-Session-Id").getValue();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            client.getConnectionManager().shutdown();
+        }
+        return null;
     }
 }
