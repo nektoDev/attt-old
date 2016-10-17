@@ -43,6 +43,8 @@ public class TransmissionService {
 
         int responseCode = con.getResponseCode();
 
+        System.out.println("[" + responseCode + "]" + con.getResponseMessage());
+
         return 200 == responseCode;
     }
 }
