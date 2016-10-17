@@ -57,6 +57,7 @@ public class TransmissionService {
 
         con.setRequestMethod("POST");
         con.addRequestProperty("Content-type", "application/json");
+        System.out.println(con.getResponseCode());
 
         return con.getHeaderField("X-Transmission-Session-Id");
     }
