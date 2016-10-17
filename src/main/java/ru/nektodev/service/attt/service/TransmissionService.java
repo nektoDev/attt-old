@@ -8,7 +8,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * @author nektodev
@@ -19,17 +18,13 @@ public class TransmissionService {
 
 
     public static final String TRANSMISSION_URL = "http://192.168.1.11:9091/transmission/rpc";
-    private CloseableHttpClient client;
 
     public TransmissionService() {
-        client = HttpClients.createDefault();
     }
 
     public boolean addToTransmission(String downloadDir, String magnet) {
+        CloseableHttpClient client = HttpClients.createDefault();
         try {
-            URL obj = new URL(TRANSMISSION_URL);
-
-
             HttpPost post = new HttpPost(TRANSMISSION_URL);
             post.addHeader("X-Transmission-Session-Id", getSession());
             String body = "{\n" +
@@ -61,6 +56,7 @@ public class TransmissionService {
     }
 
     private String getSession() {
+        CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(TRANSMISSION_URL);
         try {
             HttpResponse response = client.execute(post);
