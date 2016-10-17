@@ -23,9 +23,10 @@ public class TransmissionService {
     public boolean addToTransmission(String downloadDir, String magnet) throws IOException {
         URL obj = new URL(TRANSMISSION_URL);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
         con.setRequestMethod("POST");
-        con.addRequestProperty("X-Transmission-Session-Id", "ufYKhw26nZ6Kgafw7kpDX7F5IG4P9ie7RlSc4q3fXe4IJHuF");
-        con.addRequestProperty("Content-type", "");
+        con.addRequestProperty("X-Transmission-Session-Id", getSession());
+        con.addRequestProperty("Content-type", "application/json");
 
         String urlParameters = "{\n" +
                 "\t\"method\" : \"torrent-add\",\n" +
@@ -43,8 +44,18 @@ public class TransmissionService {
 
         int responseCode = con.getResponseCode();
 
-        System.out.println("[" + responseCode + "]" + con.getResponseMessage());
+        System.out.println("[" + responseCode + "]");
 
         return 200 == responseCode;
+    }
+
+    private String getSession() throws IOException {
+        URL obj = new URL(TRANSMISSION_URL);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        con.setRequestMethod("POST");
+        con.addRequestProperty("Content-type", "application/json");
+
+        return con.getHeaderField("X-Transmission-Session-Id");
     }
 }
