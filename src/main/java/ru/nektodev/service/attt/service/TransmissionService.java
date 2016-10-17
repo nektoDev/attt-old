@@ -25,7 +25,9 @@ public class TransmissionService {
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
         con.setRequestMethod("POST");
-        con.addRequestProperty("X-Transmission-Session-Id", getSession());
+        String session = getSession();
+        System.out.println(session);
+        con.addRequestProperty("X-Transmission-Session-Id", session);
         con.addRequestProperty("Content-type", "application/json");
 
         String urlParameters = "{\n" +
