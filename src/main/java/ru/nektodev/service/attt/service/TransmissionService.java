@@ -1,10 +1,10 @@
 package ru.nektodev.service.attt.service;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,10 +19,10 @@ public class TransmissionService {
 
 
     public static final String TRANSMISSION_URL = "http://192.168.1.11:9091/transmission/rpc";
-    private HttpClient client;
+    private CloseableHttpClient client;
 
     public TransmissionService() {
-        client = new DefaultHttpClient();
+        client = HttpClients.createDefault();
     }
 
     public boolean addToTransmission(String downloadDir, String magnet) {
@@ -52,7 +52,11 @@ public class TransmissionService {
             e.printStackTrace();
             return false;
         } finally {
-            client.getConnectionManager().shutdown();
+            try {
+                client.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -64,7 +68,11 @@ public class TransmissionService {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            client.getConnectionManager().shutdown();
+            try {
+                client.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
