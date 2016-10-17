@@ -35,7 +35,7 @@ public class TransmissionService {
                 "\t\t\"download-dir\": \""+ downloadDir +"\" \n" +
                 "\t}\n" +
                 "}";
-
+        System.out.println(urlParameters);
         con.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());
         wr.writeBytes(urlParameters);
