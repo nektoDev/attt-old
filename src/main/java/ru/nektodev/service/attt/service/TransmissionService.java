@@ -1,5 +1,9 @@
 package ru.nektodev.service.attt.service;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.stereotype.Service;
 
 import java.io.DataOutputStream;
@@ -28,7 +32,6 @@ public class TransmissionService {
         String session = getSession();
         System.out.println(session);
         con.addRequestProperty("X-Transmission-Session-Id", session);
-        con.addRequestProperty("Content-type", "application/json");
 
         String urlParameters = "{\n" +
                 "\t\"method\" : \"torrent-add\",\n" +
@@ -52,13 +55,14 @@ public class TransmissionService {
     }
 
     private String getSession() throws IOException {
-        URL obj = new URL(TRANSMISSION_URL);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-        con.setRequestMethod("POST");
-        con.addRequestProperty("Content-type", "application/json");
-        System.out.println(con.getResponseCode());
+        HttpClient client = new DefaultHttpClient();
+        HttpPost post = new HttpPost(TRANSMISSION_URL);
 
-        return con.getHeaderField("X-Transmission-Session-Id");
+        HttpResponse response = client.execute(post);
+        System.out.println("Response Code : " +
+                response.getStatusLine().getStatusCode());
+
+        return response.getFirstHeader("X-Transmission-Session-Id").getValue();
     }
 }

@@ -52,7 +52,8 @@ dependencies {
 	compile group: 'org.jsoup', name: 'jsoup', version: '1.9.2'
 //	compile group: 'nl.stil4m', name: 'transmission-rpc-java', version: '0.6.0-SNAPSHOT'
     compile files('./libs/transmission-rpc-java-0.6.0-SNAPSHOT')
-
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
 }
 
 project.version.with {
