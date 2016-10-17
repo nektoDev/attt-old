@@ -52,6 +52,7 @@ public class TorrentCheckScheduler {
                     } else {
                         System.out.println("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
                     }
+                }
             }
 
         }
