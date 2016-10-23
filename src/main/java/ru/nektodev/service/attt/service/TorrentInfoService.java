@@ -23,4 +23,12 @@ public class TorrentInfoService {
     public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) {
         return torrentInfoRepository.save(torrentInfoList);
     }
+
+    public TorrentInfo delete(String id) {
+        TorrentInfo ti = torrentInfoRepository.findOne(id);
+        if (ti != null) {
+            torrentInfoRepository.delete(id);
+        }
+        return ti;
+    }
 }

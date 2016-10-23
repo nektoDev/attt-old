@@ -1,10 +1,7 @@
 package ru.nektodev.service.attt.facade;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.nektodev.service.attt.api.TorrentInfoFacade;
 import ru.nektodev.service.attt.model.TorrentInfo;
 import ru.nektodev.service.attt.service.TorrentInfoService;
@@ -33,4 +30,11 @@ public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
     public List<TorrentInfo> save(@RequestBody List<TorrentInfo> torrentInfoList) {
         return service.save(torrentInfoList);
     }
+
+    @Override
+    @RequestMapping(method = RequestMethod.DELETE)
+    public TorrentInfo delete(@RequestBody TorrentInfo id) {
+        return service.delete(id.getUrl());
+    }
+
 }
