@@ -3,7 +3,6 @@ buildscript {
 		springBootVersion = '1.4.1.RELEASE'
 	}
 	repositories {
-        mavenLocal()
 		mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
@@ -19,7 +18,7 @@ plugins {
     id "net.vivin.gradle-semantic-build-versioning" version "2.0.2"
 }
 
-
+apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: "com.palantir.docker"
@@ -41,6 +40,7 @@ targetCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+    mavenLocal()
 }
 
 
@@ -54,6 +54,7 @@ dependencies {
     compile files('./libs/transmission-rpc-java-0.6.0-SNAPSHOT')
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
+    compile group: 'ru.nektodev.notification_service', name: 'client', version: '0.1.1-SNAPSHOT'
 }
 
 project.version.with {

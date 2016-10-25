@@ -2,6 +2,7 @@ package ru.nektodev.service.attt.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.nektodev.notification.api.NotificationFacade;
 import ru.nektodev.service.attt.model.TorrentInfo;
 import ru.nektodev.service.attt.repository.TorrentInfoRepository;
 
@@ -16,8 +17,18 @@ public class TorrentInfoService {
     @Autowired
     private TorrentInfoRepository torrentInfoRepository;
 
+    @Autowired
+    private NotificationFacade facade;
+
     public List<TorrentInfo> list() {
-        return torrentInfoRepository.findAll();
+        List<TorrentInfo> all = torrentInfoRepository.findAll();
+        StringBuilder sg = new StringBuilder("Watched torrents: \n");
+        for (TorrentInfo torrentInfo : all) {
+            sg.append(torrentInfo.getName()).append(" ").append(torrentInfo.getUrl()).append("\n");
+        }
+        facade.sendMessage("family", sg.toString());
+
+        return all;
     }
 
     public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) {

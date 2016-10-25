@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import ru.nektodev.notification.api.NotificationFacade;
 import ru.nektodev.service.attt.model.TorrentInfo;
 import ru.nektodev.service.attt.repository.TorrentInfoRepository;
 
@@ -29,6 +30,9 @@ public class TorrentCheckScheduler {
     @Autowired
     TransmissionService transmissionService;
 
+    @Autowired
+    private NotificationFacade notification;
+
 //    @Scheduled(cron="${scheduler.import.cron}")
     @Scheduled(cron="${scheduler.import.cron}")
     public void checkTorrent() throws IOException {
@@ -42,12 +46,14 @@ public class TorrentCheckScheduler {
                 if (isMagnet(element)) {
                     if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
                         System.out.println("New torrent for: " + torrentInfo.getName());
+                        notification.sendMessage("family", "New torrent for: " + torrentInfo.getName());
                         if (transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet)) {
                             System.out.println("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
                             torrentInfo.setMagnet(magnet);
                             torrentInfoRepository.save(Collections.singletonList(torrentInfo));
                         } else {
                             System.out.println("Error while add torrent: " + torrentInfo.getName());
+                            notification.sendMessage("family", "Error while add torrent: " + torrentInfo.getName());
                         }
                     } else {
                         System.out.println("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
