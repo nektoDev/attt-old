@@ -22,7 +22,7 @@ import java.util.Collections;
 @Service
 public class TorrentCheckScheduler {
 
-    public static final Logger LOG = Logger.getLogger(TorrentCheckScheduler.class);
+    private static final Logger LOG = Logger.getLogger(TorrentCheckScheduler.class);
 
     @Autowired
     private TorrentInfoRepository torrentInfoRepository;
@@ -43,19 +43,27 @@ public class TorrentCheckScheduler {
             for (Element element : elements) {
                 String magnet = element.attr("href");
                 if (isMagnet(element)) {
+
                     if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
-                        System.out.println("New torrent for: " + torrentInfo.getName());
-                        notification.sendMessage("family", "New torrent for: " + torrentInfo.getName());
+
+                        LOG.info("New torrent for: " + torrentInfo.getName());
+                        String msg = String.format("New torrent for: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
+                        notification.sendMessage("family", msg);
+
                         if (transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet)) {
-                            System.out.println("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
+
+                            LOG.info("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
                             torrentInfo.setMagnet(magnet);
                             torrentInfoRepository.save(Collections.singletonList(torrentInfo));
+
                         } else {
-                            System.out.println("Error while add torrent: " + torrentInfo.getName());
+
+                            LOG.error("Error while add torrent: " + torrentInfo.getName());
                             notification.sendMessage("family", "Error while add torrent: " + torrentInfo.getName());
+
                         }
                     } else {
-                        System.out.println("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
+                        LOG.debug("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
                     }
                 }
             }
