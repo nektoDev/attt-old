@@ -33,7 +33,6 @@ public class TorrentCheckScheduler {
     @Autowired
     private NotificationFacade notification;
 
-//    @Scheduled(cron="${scheduler.import.cron}")
     @Scheduled(cron="${scheduler.import.cron}")
     public void checkTorrent() throws IOException {
         LOG.info("Start scheduled check.");
