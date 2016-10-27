@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.nektodev.service.attt.api.TorrentInfoFacade;
 import ru.nektodev.service.attt.model.TorrentInfo;
+import ru.nektodev.service.attt.service.TorrentCheckScheduler;
 import ru.nektodev.service.attt.service.TorrentInfoService;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -18,6 +20,9 @@ public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
 
     @Autowired
     private TorrentInfoService service;
+
+    @Autowired
+    private TorrentCheckScheduler torrentChecker;
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
@@ -35,6 +40,12 @@ public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
     @RequestMapping(method = RequestMethod.DELETE)
     public TorrentInfo delete(@RequestBody TorrentInfo id) {
         return service.delete(id.getUrl());
+    }
+
+    @Override
+    @RequestMapping(method = RequestMethod.GET)
+    public void forceCheck() throws IOException {
+        torrentChecker.checkTorrent();
     }
 
 }
