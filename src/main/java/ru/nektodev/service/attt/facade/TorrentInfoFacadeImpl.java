@@ -43,7 +43,7 @@ public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
     }
 
     @Override
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, path = "/forceCheck")
     public void forceCheck() throws IOException {
         torrentChecker.checkTorrent();
     }
