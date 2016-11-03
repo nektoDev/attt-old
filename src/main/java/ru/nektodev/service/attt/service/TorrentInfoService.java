@@ -70,16 +70,20 @@ public class TorrentInfoService {
             torrentInfo.setAdded(new Date());
 
             String message = "Torrent has been successfully added: \n\n Hash:" + hash + "\nDownload directory: " + torrentInfo.getDownloadDir();
-            if (torrentInfo.getWatchers() != null && !torrentInfo.getWatchers().isEmpty()) {
-                for (String w : torrentInfo.getWatchers()) {
-                    notificationFacade.sendMessage(w, message);
-                }
-            } else {
-                notificationFacade.sendMessage(DEFAULT_WATCHER, message);
-            }
+            notify(torrentInfo, message);
         }
 
         return torrentInfoRepository.save(torrentInfoList);
+    }
+
+    private void notify(TorrentInfo torrentInfo, String message) {
+        if (torrentInfo.getWatchers() != null && !torrentInfo.getWatchers().isEmpty()) {
+            for (String w : torrentInfo.getWatchers()) {
+                notificationFacade.sendMessage(w, message);
+            }
+        } else {
+            notificationFacade.sendMessage(DEFAULT_WATCHER, message);
+        }
     }
 
     public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) {
@@ -102,5 +106,20 @@ public class TorrentInfoService {
             torrentInfoRepository.delete(id);
         }
         return ti;
+    }
+
+    public void finish(TorrentInfo torrentInfo) {
+        List<TorrentInfo> byHash = torrentInfoRepository.findByHash(torrentInfo.getHash());
+        Optional<TorrentInfo> founded = byHash.stream()
+                .sorted((o1, o2) -> o2.getAdded().compareTo(o1.getAdded()))
+                .findFirst();
+
+        if (founded.isPresent()) {
+            founded.get().setFinished(new Date());
+            founded.get().setName(torrentInfo.getName());
+            torrentInfoRepository.save(founded.get());
+            String message = String.format("Torrent downloaded \n\nName: %s \n\nHash: %s", torrentInfo.getName(), torrentInfo.getHash());
+            notify(founded.get(), message);
+        }
     }
 }

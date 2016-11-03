@@ -19,11 +19,11 @@ public interface TorrentInfoFacade {
 
     public ResponseEntity<List<TorrentInfo>> add(List<TorrentInfo> torrentInfoList) throws IOException;
 
-    @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<String> update(@RequestBody List<TorrentInfo> torrentInfoList);
+
+    void finishDownload(@RequestBody TorrentInfo torrentInfo);
 
     TorrentInfo delete(@RequestBody String id);
 
-    @RequestMapping(method = RequestMethod.GET)
     void forceCheck() throws IOException;
 }

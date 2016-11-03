@@ -52,10 +52,12 @@ public class TorrentCheckScheduler {
                         LOG.info(msg);
                         notify(torrentInfo, msg);
 
-                        if (!Strings.isNullOrEmpty(transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet))) {
+                        String hash = transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet);
+                        if (!Strings.isNullOrEmpty(hash)) {
 
                             LOG.info("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
                             torrentInfo.setMagnet(magnet);
+                            torrentInfo.setHash(hash);
                             torrentInfoRepository.save(Collections.singletonList(torrentInfo));
 
                         } else {

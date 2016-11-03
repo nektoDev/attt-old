@@ -60,6 +60,12 @@ public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
     }
 
     @Override
+    @RequestMapping(path = "/finish", method = RequestMethod.POST)
+    public void finishDownload(@RequestBody TorrentInfo torrentInfo) {
+        service.finish(torrentInfo);
+    }
+
+    @Override
     @RequestMapping(method = RequestMethod.DELETE)
     public TorrentInfo delete(@RequestBody String id) {
         return service.delete(id);
