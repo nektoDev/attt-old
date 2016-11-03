@@ -15,6 +15,7 @@ import ru.nektodev.service.attt.repository.TorrentInfoRepository;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author nektodev
@@ -37,7 +38,7 @@ public class TorrentCheckScheduler {
     @Scheduled(cron="${scheduler.import.cron}")
     public void checkTorrent() throws IOException {
         LOG.info("Start scheduled check.");
-        for (TorrentInfo torrentInfo : torrentInfoRepository.findAll()) {
+        for (TorrentInfo torrentInfo : torrentInfoRepository.findByAutoDownload(true)) {
             Document doc = Jsoup.connect(torrentInfo.getUrl()).get();
             Elements elements = doc.select("a");
             elements.attr("href");
@@ -47,9 +48,9 @@ public class TorrentCheckScheduler {
 
                     if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
 
-                        LOG.info("New torrent for: " + torrentInfo.getName());
                         String msg = String.format("New torrent for: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
-                        notification.sendMessage("family", msg);
+                        LOG.info(msg);
+                        notify(torrentInfo, msg);
 
                         if (!Strings.isNullOrEmpty(transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet))) {
 
@@ -59,8 +60,9 @@ public class TorrentCheckScheduler {
 
                         } else {
 
-                            LOG.error("Error while add torrent: " + torrentInfo.getName());
-                            notification.sendMessage("family", "Error while add torrent: " + torrentInfo.getName());
+                            String error = String.format("Error while add torrent: %s", torrentInfo.getName());
+                            LOG.error(error);
+                            notify(torrentInfo, error);
 
                         }
                     } else {
@@ -72,6 +74,13 @@ public class TorrentCheckScheduler {
         }
 
         LOG.info("Scheduled check completed");
+    }
+
+    private void notify(TorrentInfo torrentInfo, String msg) {
+        List<String> watchers = torrentInfo.getWatchers();
+        for (String watcher : watchers) {
+            notification.sendMessage(watcher, msg);
+        }
     }
 
     private boolean isMagnet(Element element) {

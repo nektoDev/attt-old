@@ -14,6 +14,7 @@ import ru.nektodev.service.attt.repository.TorrentInfoRepository;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author nektodev
@@ -82,6 +83,16 @@ public class TorrentInfoService {
     }
 
     public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) {
+        torrentInfoList.stream()
+                .filter(torrentInfo -> Strings.isNullOrEmpty(torrentInfo.getId()))
+                .forEach(torrentInfo -> {
+                    List<TorrentInfo> byHash = torrentInfoRepository.findByHash(torrentInfo.getHash());
+                    Optional<TorrentInfo> founded = byHash.stream()
+                            .sorted((o1, o2) -> o2.getAdded().compareTo(o1.getAdded()))
+                            .findFirst();
+                    torrentInfo.setId(founded.get().getId());
+                });
+
         return torrentInfoRepository.save(torrentInfoList);
     }
 
