@@ -1,5 +1,6 @@
 package ru.nektodev.service.attt.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * @author nektodev
@@ -17,13 +20,13 @@ import java.io.IOException;
 @Service
 public class TransmissionService {
 
-    @Value("#{transmission.url}")
-    private static String TRANSMISSION_URL;
+    @Value("${transmission.url}")
+    private String TRANSMISSION_URL;
 
     public TransmissionService() {
     }
 
-    public boolean addToTransmission(String downloadDir, String magnet) {
+    public String addToTransmission(String downloadDir, String magnet) {
         CloseableHttpClient client = HttpClients.createDefault();
         try {
             HttpPost post = new HttpPost(TRANSMISSION_URL);
@@ -39,20 +42,31 @@ public class TransmissionService {
             post.setEntity(params);
             HttpResponse response = client.execute(post);
 
-            int responseCode = response.getStatusLine().getStatusCode();
-
-            System.out.println("[" + responseCode + "]");
-
-            return 200 == responseCode;
+            return getHash(response.getEntity().getContent());
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return null;
         } finally {
             try {
                 client.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private String getHash (InputStream content) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> jsonMap = mapper.readValue(content, Map.class);
+        if ("success".equalsIgnoreCase((String) jsonMap.get("result"))) {
+            Object torrent = ((Map) jsonMap.get("arguments")).get("torrent-added");
+            if (torrent == null) {
+                torrent = ((Map) jsonMap.get("arguments")).get("torrent-duplicate");
+            }
+
+            return (String) ((Map) torrent).get("hashString");
+        } else {
+            return null;
         }
     }
 

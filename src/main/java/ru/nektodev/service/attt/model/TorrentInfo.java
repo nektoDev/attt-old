@@ -13,6 +13,7 @@ import java.util.List;
 public class TorrentInfo implements Serializable {
     @Id
     private String id;
+    private String hash;
     private String name;
     private String url;
     private String magnet;
@@ -94,5 +95,13 @@ public class TorrentInfo implements Serializable {
 
     public void setFinished(Date finished) {
         this.finished = finished;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 }

@@ -1,6 +1,6 @@
 package ru.nektodev.service.attt.api;
 
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,9 +17,12 @@ public interface TorrentInfoFacade {
 
     public List<TorrentInfo> list();
 
-    public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList);
+    public ResponseEntity<List<TorrentInfo>> add(List<TorrentInfo> torrentInfoList) throws IOException;
 
-    TorrentInfo delete(@RequestBody TorrentInfo id);
+    @RequestMapping(method = RequestMethod.POST)
+    ResponseEntity<String> update(@RequestBody List<TorrentInfo> torrentInfoList);
+
+    TorrentInfo delete(@RequestBody String id);
 
     @RequestMapping(method = RequestMethod.GET)
     void forceCheck() throws IOException;

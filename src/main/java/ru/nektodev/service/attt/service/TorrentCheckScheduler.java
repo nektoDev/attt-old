@@ -1,5 +1,6 @@
 package ru.nektodev.service.attt.service;
 
+import com.google.common.base.Strings;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,7 +29,7 @@ public class TorrentCheckScheduler {
     private TorrentInfoRepository torrentInfoRepository;
 
     @Autowired
-    TransmissionService transmissionService;
+    private TransmissionService transmissionService;
 
     @Autowired
     private NotificationFacade notification;
@@ -50,7 +51,7 @@ public class TorrentCheckScheduler {
                         String msg = String.format("New torrent for: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
                         notification.sendMessage("family", msg);
 
-                        if (transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet)) {
+                        if (!Strings.isNullOrEmpty(transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet))) {
 
                             LOG.info("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
                             torrentInfo.setMagnet(magnet);
