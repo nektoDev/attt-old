@@ -5,6 +5,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,8 +17,8 @@ import java.io.IOException;
 @Service
 public class TransmissionService {
 
-
-    public static final String TRANSMISSION_URL = "http://192.168.1.11:9091/transmission/rpc";
+    @Value("#{transmission.url}")
+    private static String TRANSMISSION_URL;
 
     public TransmissionService() {
     }
