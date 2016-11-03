@@ -68,7 +68,7 @@ public class TorrentInfoService {
             torrentInfo.setHash(hash);
             torrentInfo.setAdded(new Date());
 
-            String message = "Torrent has been succesfully added: \n\n Hash:" + hash + "\nDownload directory: " + torrentInfo.getDownloadDir();
+            String message = "Torrent has been successfully added: \n\n Hash:" + hash + "\nDownload directory: " + torrentInfo.getDownloadDir();
             if (torrentInfo.getWatchers() != null && !torrentInfo.getWatchers().isEmpty()) {
                 for (String w : torrentInfo.getWatchers()) {
                     notificationFacade.sendMessage(w, message);
