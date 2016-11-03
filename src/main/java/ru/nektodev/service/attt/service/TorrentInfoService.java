@@ -116,7 +116,9 @@ public class TorrentInfoService {
 
         if (founded.isPresent()) {
             founded.get().setFinished(new Date());
-            founded.get().setName(torrentInfo.getName());
+            if (Strings.isNullOrEmpty(founded.get().getName())) {
+                founded.get().setName(torrentInfo.getName());
+            }
             torrentInfoRepository.save(founded.get());
             String message = String.format("Torrent downloaded \n\nName: %s \n\nHash: %s", torrentInfo.getName(), torrentInfo.getHash());
             notify(founded.get(), message);
