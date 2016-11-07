@@ -80,7 +80,10 @@ public class TorrentInfoService {
 
         TorrentInfo torrent = torrentInfoOptional.get();
 
-        torrent.setName(name);
+
+        if (Strings.isNullOrEmpty(torrent.getName())) {
+            torrent.setName(name);
+        }
         torrent.setFinishDate(new Date());
 
         String message = String.format("Torrent downloaded \n\nName: %s \n\nHash: %s", torrent.getName(), torrent.getHash());

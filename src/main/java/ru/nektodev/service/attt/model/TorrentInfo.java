@@ -26,6 +26,7 @@ public class TorrentInfo implements Serializable {
 
     private boolean tracked;
     private Date lastCheckDate;
+    private Date lastUpdateDate;
 
     public String getUrl() {
         return url;
@@ -113,5 +114,13 @@ public class TorrentInfo implements Serializable {
 
     public void setLastCheckDate(Date lastCheckDate) {
         this.lastCheckDate = lastCheckDate;
+    }
+
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

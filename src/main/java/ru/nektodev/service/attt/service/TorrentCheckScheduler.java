@@ -11,6 +11,7 @@ import ru.nektodev.service.attt.repository.TorrentInfoRepository;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 
 /**
  * @author nektodev
@@ -34,9 +35,11 @@ public class TorrentCheckScheduler {
     public void checkTorrent() throws IOException {
         LOG.info("Start scheduled check.");
         TrackerParser parser = new TrackerParser();
+        Date lastCheckDate = new Date();
 
         for (TorrentInfo torrentInfo : torrentInfoRepository.findByTracked(true)) {
             String magnet = parser.getMagnetFromUrl(torrentInfo.getUrl());
+            torrentInfo.setLastCheckDate(lastCheckDate);
 
             if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
 
@@ -44,24 +47,27 @@ public class TorrentCheckScheduler {
                 LOG.info(msg);
                 notification.notify(torrentInfo.getWatchers(), msg);
 
-                sendToTransmission(torrentInfo, magnet);
+                torrentInfo = sendToTransmission(torrentInfo, magnet);
 
             } else {
                 LOG.debug("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
             }
+
+            torrentInfoRepository.save(Collections.singletonList(torrentInfo));
         }
 
         LOG.info("Scheduled check completed");
     }
 
-    private void sendToTransmission(TorrentInfo torrentInfo, String magnet) {
+    private TorrentInfo sendToTransmission(TorrentInfo torrentInfo, String magnet) {
         String hash = transmissionService.addToTransmission(torrentInfo.getDownloadDir(), magnet);
         if (!Strings.isNullOrEmpty(hash)) {
 
             LOG.info("Succesfully added: " + torrentInfo.getName() + " with magnet: " + magnet);
             torrentInfo.setMagnet(magnet);
             torrentInfo.setHash(hash);
-            torrentInfoRepository.save(Collections.singletonList(torrentInfo));
+            torrentInfo.setAddDate(null);
+            torrentInfo.setLastUpdateDate(new Date());
 
         } else {
 
@@ -70,5 +76,6 @@ public class TorrentCheckScheduler {
             notification.notify(torrentInfo.getWatchers(), error);
 
         }
+        return torrentInfo;
     }
 }
