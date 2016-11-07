@@ -21,8 +21,9 @@ public class NotificationService {
 
     public void notify(List<String> watchers, String message) {
         if (watchers == null || watchers.isEmpty()) {
-            DEFAULT_WATCHER = "slava";
             notificationFacade.sendMessage(DEFAULT_WATCHER, message);
+        } else {
+            notificationFacade.sendMessage(watchers, message);
         }
     }
 }
