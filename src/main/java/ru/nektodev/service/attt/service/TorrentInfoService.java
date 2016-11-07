@@ -54,7 +54,7 @@ public class TorrentInfoService {
             torrentInfo.setHash(hash);
             torrentInfo.setAddDate(new Date());
 
-            String message = "Torrent has been successfully added: \n\n Hash:" + hash + "\nDownload directory: " + torrentInfo.getDownloadDir();
+            String message = "Torrent has been successfully added: \n\nHash:" + hash + "\nDownload directory: " + torrentInfo.getDownloadDir();
             notificationService.notify(torrentInfo.getWatchers(), message);
         }
 
@@ -86,7 +86,7 @@ public class TorrentInfoService {
         }
         torrent.setFinishDate(new Date());
 
-        String message = String.format("Torrent downloaded \n\nName: %s \n\nHash: %s", torrent.getName(), torrent.getHash());
+        String message = String.format("Torrent downloaded \n\nName: %s \nHash: %s", torrent.getName(), torrent.getHash());
         notificationService.notify(torrent.getWatchers(), message);
 
         return torrentInfoRepository.save(torrent);
