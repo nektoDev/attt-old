@@ -49,6 +49,7 @@ public class TorrentFacadeImpl implements TorrentFacade {
     }
 
     @Override
+    @RequestMapping(method = RequestMethod.POST, path = "/finalize")
     public ResponseEntity<TorrentInfo> finalizeTorrent(@RequestBody FinalizeRequest request) {
         return ResponseEntity.ok(service.finish(request.getHash(), request.getName()));
     }
