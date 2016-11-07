@@ -24,7 +24,7 @@ public class TorrentInfo implements Serializable {
     private Date addDate;
     private Date finishDate;
 
-    private boolean autoDownload;
+    private boolean tracked;
     private Date lastCheckDate;
 
     public String getUrl() {
@@ -59,12 +59,12 @@ public class TorrentInfo implements Serializable {
         this.name = name;
     }
 
-    public boolean isAutoDownload() {
-        return autoDownload;
+    public boolean isTracked() {
+        return tracked;
     }
 
-    public void setAutoDownload(boolean autoDownload) {
-        this.autoDownload = autoDownload;
+    public void setTracked(boolean tracked) {
+        this.tracked = tracked;
     }
 
     public List<String> getWatchers() {

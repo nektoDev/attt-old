@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface TorrentInfoRepository extends MongoRepository<TorrentInfo, String> {
 
-    List<TorrentInfo> findByAutoDownload(boolean autoDownload);
+    List<TorrentInfo> findByTracked(boolean autoDownload);
 
     List<TorrentInfo> findByHash(String hash);
 }
