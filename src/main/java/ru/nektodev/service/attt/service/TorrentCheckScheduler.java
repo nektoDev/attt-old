@@ -67,6 +67,7 @@ public class TorrentCheckScheduler {
             torrentInfo.setMagnet(magnet);
             torrentInfo.setHash(hash);
             torrentInfo.setAddDate(null);
+            torrentInfo.setFinishDate(null);
             torrentInfo.setLastUpdateDate(new Date());
 
         } else {
