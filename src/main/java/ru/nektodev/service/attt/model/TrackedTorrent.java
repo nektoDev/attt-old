@@ -14,7 +14,6 @@ public class TrackedTorrent implements Serializable {
     @Id
     private String id;
     private String torrentInfoId;
-    private Date addDate;
     private Date lastCheckDate;
     private Date lastUpdateDate;
 
@@ -23,7 +22,6 @@ public class TrackedTorrent implements Serializable {
         return Objects.toStringHelper(this)
                 .add("id", id)
                 .add("torrentInfoId", torrentInfoId)
-                .add("addDate", addDate)
                 .add("lastCheckDate", lastCheckDate)
                 .add("lastUpdateDate", lastUpdateDate)
                 .toString();
@@ -36,14 +34,13 @@ public class TrackedTorrent implements Serializable {
         TrackedTorrent that = (TrackedTorrent) o;
         return Objects.equal(id, that.id) &&
                 Objects.equal(torrentInfoId, that.torrentInfoId) &&
-                Objects.equal(addDate, that.addDate) &&
                 Objects.equal(lastCheckDate, that.lastCheckDate) &&
                 Objects.equal(lastUpdateDate, that.lastUpdateDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, torrentInfoId, addDate, lastCheckDate, lastUpdateDate);
+        return Objects.hashCode(id, torrentInfoId, lastCheckDate, lastUpdateDate);
     }
 
     public String getId() {
@@ -61,14 +58,6 @@ public class TrackedTorrent implements Serializable {
 
     public void setTorrentInfoId(String torrentInfoId) {
         this.torrentInfoId = torrentInfoId;
-    }
-
-    public Date getAddDate() {
-        return addDate;
-    }
-
-    public void setAddDate(Date addDate) {
-        this.addDate = addDate;
     }
 
     public Date getLastCheckDate() {
