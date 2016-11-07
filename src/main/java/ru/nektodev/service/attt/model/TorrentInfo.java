@@ -13,17 +13,17 @@ import java.util.List;
 public class TorrentInfo implements Serializable {
     @Id
     private String id;
+
     private String hash;
     private String name;
     private String url;
     private String magnet;
     private String downloadDir;
-    private boolean autoDownload;
 
     private List<String> watchers;
 
-    private Date added;
-    private Date finished;
+    private Date addDate;
+    private Date finishDate;
 
     public String getUrl() {
         return url;
@@ -57,14 +57,6 @@ public class TorrentInfo implements Serializable {
         this.name = name;
     }
 
-    public boolean isAutoDownload() {
-        return autoDownload;
-    }
-
-    public void setAutoDownload(boolean autoDownload) {
-        this.autoDownload = autoDownload;
-    }
-
     public List<String> getWatchers() {
         return watchers;
     }
@@ -81,20 +73,20 @@ public class TorrentInfo implements Serializable {
         this.id = id;
     }
 
-    public Date getAdded() {
-        return added;
+    public Date getAddDate() {
+        return addDate;
     }
 
-    public void setAdded(Date added) {
-        this.added = added;
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
     }
 
-    public Date getFinished() {
-        return finished;
+    public Date getFinishDate() {
+        return finishDate;
     }
 
-    public void setFinished(Date finished) {
-        this.finished = finished;
+    public void setFinishDate(Date finishDate) {
+        this.finishDate = finishDate;
     }
 
     public String getHash() {

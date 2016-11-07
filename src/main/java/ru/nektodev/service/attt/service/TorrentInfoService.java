@@ -67,7 +67,7 @@ public class TorrentInfoService {
             }
 
             torrentInfo.setHash(hash);
-            torrentInfo.setAdded(new Date());
+            torrentInfo.setAddDate(new Date());
 
             String message = "Torrent has been successfully added: \n\n Hash:" + hash + "\nDownload directory: " + torrentInfo.getDownloadDir();
             notify(torrentInfo, message);
@@ -92,7 +92,7 @@ public class TorrentInfoService {
                 .forEach(torrentInfo -> {
                     List<TorrentInfo> byHash = torrentInfoRepository.findByHash(torrentInfo.getHash());
                     Optional<TorrentInfo> founded = byHash.stream()
-                            .sorted((o1, o2) -> o2.getAdded().compareTo(o1.getAdded()))
+                            .sorted((o1, o2) -> o2.getAddDate().compareTo(o1.getAddDate()))
                             .findFirst();
                     torrentInfo.setId(founded.get().getId());
                 });
@@ -111,11 +111,11 @@ public class TorrentInfoService {
     public void finish(TorrentInfo torrentInfo) {
         List<TorrentInfo> byHash = torrentInfoRepository.findByHash(torrentInfo.getHash());
         Optional<TorrentInfo> founded = byHash.stream()
-                .sorted((o1, o2) -> o2.getAdded().compareTo(o1.getAdded()))
+                .sorted((o1, o2) -> o2.getAddDate().compareTo(o1.getAddDate()))
                 .findFirst();
 
         if (founded.isPresent()) {
-            founded.get().setFinished(new Date());
+            founded.get().setFinishDate(new Date());
             if (Strings.isNullOrEmpty(founded.get().getName())) {
                 founded.get().setName(torrentInfo.getName());
             }
