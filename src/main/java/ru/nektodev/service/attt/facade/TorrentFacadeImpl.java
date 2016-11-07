@@ -3,10 +3,7 @@ package ru.nektodev.service.attt.facade;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.nektodev.service.attt.api.TorrentFacade;
 import ru.nektodev.service.attt.model.FinalizeRequest;
 import ru.nektodev.service.attt.model.TorrentInfo;
@@ -42,7 +39,7 @@ public class TorrentFacadeImpl implements TorrentFacade {
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity save(List<TorrentInfo> torrentInfoList) throws IOException {
+    public ResponseEntity save(@RequestBody List<TorrentInfo> torrentInfoList) throws IOException {
         String validateResult = validateAddTorrent(torrentInfoList);
         if (!Strings.isNullOrEmpty(validateResult)) {
             return ResponseEntity.badRequest().body(validateResult);
@@ -52,13 +49,13 @@ public class TorrentFacadeImpl implements TorrentFacade {
     }
 
     @Override
-    public ResponseEntity<TorrentInfo> finalizeTorrent(FinalizeRequest request) {
+    public ResponseEntity<TorrentInfo> finalizeTorrent(@RequestBody FinalizeRequest request) {
         return ResponseEntity.ok(service.finish(request.getHash(), request.getName()));
     }
 
     @Override
     @RequestMapping(method = RequestMethod.DELETE)
-    public TorrentInfo delete(@RequestBody String id) {
+    public TorrentInfo delete(@RequestParam String id) {
         return service.delete(id);
     }
 
