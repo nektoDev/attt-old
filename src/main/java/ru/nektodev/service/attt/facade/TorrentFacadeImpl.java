@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import ru.nektodev.service.attt.api.TorrentInfoFacade;
+import ru.nektodev.service.attt.api.TorrentFacade;
+import ru.nektodev.service.attt.model.FinalizeRequest;
 import ru.nektodev.service.attt.model.TorrentInfo;
 import ru.nektodev.service.attt.service.TorrentCheckScheduler;
 import ru.nektodev.service.attt.service.TorrentInfoService;
@@ -20,12 +21,13 @@ import java.util.List;
  * @date 16/10/2016
  */
 @RestController()
-@RequestMapping("/torrents")
-public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
+@RequestMapping("/torrent")
+public class TorrentFacadeImpl implements TorrentFacade {
 
-    public static final String ERROR_URL = "Rutracker URL or magnet must be provided";
-    public static final String ERROR_DOWNLOAD_DIR = "Download directory must be provided";
-    public static final String ERROR_HASH_OR_ID = "Torrent id or hash must be provided";
+    private static final String ERROR_URL = "Rutracker URL or magnet must be provided";
+    private static final String ERROR_DOWNLOAD_DIR = "Download directory must be provided";
+    private static final String ERROR_HASH_OR_ID = "Torrent id or hash must be provided";
+
     @Autowired
     private TorrentInfoService service;
 
@@ -34,35 +36,24 @@ public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    public List<TorrentInfo> list() {
-        return service.list();
+    public ResponseEntity<List<TorrentInfo>> list() {
+        return ResponseEntity.ok(service.list());
     }
 
     @Override
-    @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity add(@RequestBody List<TorrentInfo> torrentInfoList) throws IOException {
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity save(List<TorrentInfo> torrentInfoList) throws IOException {
         String validateResult = validateAddTorrent(torrentInfoList);
         if (!Strings.isNullOrEmpty(validateResult)) {
             return ResponseEntity.badRequest().body(validateResult);
         }
 
-        return ResponseEntity.ok(service.add(torrentInfoList)); //TODO should return ResponseEntity.created
-    }
-
-    @Override
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity update(@RequestBody List<TorrentInfo> torrentInfoList) {
-        String validateResult = validateUpdateTorrent(torrentInfoList);
-        if (!Strings.isNullOrEmpty(validateResult)) {
-            return ResponseEntity.badRequest().body(validateResult);
-        }
         return ResponseEntity.ok(service.save(torrentInfoList));
     }
 
     @Override
-    @RequestMapping(path = "/finish", method = RequestMethod.POST)
-    public void finishDownload(@RequestBody TorrentInfo torrentInfo) {
-        service.finish(torrentInfo);
+    public ResponseEntity<TorrentInfo> finalizeTorrent(FinalizeRequest request) {
+        return ResponseEntity.ok(service.finish(request.getHash(), request.getName()));
     }
 
     @Override
@@ -91,19 +82,4 @@ public class TorrentInfoFacadeImpl implements TorrentInfoFacade {
 
         return result.toString();
     }
-
-    private String validateUpdateTorrent(List<TorrentInfo> torrentInfoList) {
-        StringBuilder result = new StringBuilder();
-
-        torrentInfoList.stream()
-                .filter(torrentInfo -> Strings.isNullOrEmpty(torrentInfo.getId()) && Strings.isNullOrEmpty(torrentInfo.getHash()))
-                .forEach(torrentInfo ->
-                        result.append(torrentInfo.getName())
-                                .append(" ")
-                                .append(ERROR_HASH_OR_ID)
-                );
-
-        return result.toString();
-    }
-
 }

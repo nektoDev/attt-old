@@ -54,7 +54,7 @@ dependencies {
     compile files('./libs/transmission-rpc-java-0.6.0-SNAPSHOT')
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
-    compile group: 'ru.nektodev.notification_service', name: 'client', version: '0.1.1-SNAPSHOT'
+    compile group: 'ru.nektodev.notification_service', name: 'client', version: '0.1.5'
 }
 
 project.version.with {

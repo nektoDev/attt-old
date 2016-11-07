@@ -18,12 +18,14 @@ public class TorrentInfo implements Serializable {
     private String url;
     private String magnet;
     private String downloadDir;
-    private boolean autoDownload;
 
     private List<String> watchers;
 
-    private Date added;
-    private Date finished;
+    private Date addDate;
+    private Date finishDate;
+
+    private boolean autoDownload;
+    private Date lastCheckDate;
 
     public String getUrl() {
         return url;
@@ -81,20 +83,20 @@ public class TorrentInfo implements Serializable {
         this.id = id;
     }
 
-    public Date getAdded() {
-        return added;
+    public Date getAddDate() {
+        return addDate;
     }
 
-    public void setAdded(Date added) {
-        this.added = added;
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
     }
 
-    public Date getFinished() {
-        return finished;
+    public Date getFinishDate() {
+        return finishDate;
     }
 
-    public void setFinished(Date finished) {
-        this.finished = finished;
+    public void setFinishDate(Date finishDate) {
+        this.finishDate = finishDate;
     }
 
     public String getHash() {
@@ -103,5 +105,13 @@ public class TorrentInfo implements Serializable {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public Date getLastCheckDate() {
+        return lastCheckDate;
+    }
+
+    public void setLastCheckDate(Date lastCheckDate) {
+        this.lastCheckDate = lastCheckDate;
     }
 }

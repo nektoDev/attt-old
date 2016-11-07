@@ -32,7 +32,7 @@ public class TransmissionService {
             HttpPost post = new HttpPost(TRANSMISSION_URL);
             post.addHeader("X-Transmission-Session-Id", getSession());
             String body = "{\n" +
-                    "\t\"method\" : \"torrent-add\",\n" +
+                    "\t\"method\" : \"torrent-save\",\n" +
                     "\t\"arguments\" : {\n" +
                     "\t\t\"filename\":\"" + magnet + "\",\n" +
                     "\t\t\"download-dir\": \"" + downloadDir + "\" \n" +

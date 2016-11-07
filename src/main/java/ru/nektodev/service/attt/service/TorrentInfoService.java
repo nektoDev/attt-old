@@ -4,9 +4,7 @@ import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.nektodev.notification.api.NotificationFacade;
 import ru.nektodev.service.attt.model.TorrentInfo;
 import ru.nektodev.service.attt.parser.TrackerParser;
 import ru.nektodev.service.attt.repository.TorrentInfoRepository;
@@ -28,29 +26,16 @@ public class TorrentInfoService {
     private TorrentInfoRepository torrentInfoRepository;
 
     @Autowired
-    private NotificationFacade facade;
-
-    @Autowired
     private TransmissionService transmissionService;
 
     @Autowired
-    private NotificationFacade notificationFacade;
-
-    @Value("${default.watcher}")
-    private String DEFAULT_WATCHER;
+    private NotificationService notificationService;
 
     public List<TorrentInfo> list() {
-        List<TorrentInfo> all = torrentInfoRepository.findAll();
-        StringBuilder sg = new StringBuilder("Watched torrents: \n");
-        for (TorrentInfo torrentInfo : all) {
-            sg.append(torrentInfo.getName()).append(" ").append(torrentInfo.getUrl()).append("\n");
-        }
-        facade.sendMessage("family", sg.toString());
-
-        return all;
+        return torrentInfoRepository.findAll();
     }
 
-    public List<TorrentInfo> add(List<TorrentInfo> torrentInfoList) throws IOException {
+    public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) throws IOException {
         for (TorrentInfo torrentInfo : torrentInfoList) {
             String hash;
             if (!Strings.isNullOrEmpty(torrentInfo.getMagnet())) {
@@ -67,35 +52,11 @@ public class TorrentInfoService {
             }
 
             torrentInfo.setHash(hash);
-            torrentInfo.setAdded(new Date());
+            torrentInfo.setAddDate(new Date());
 
             String message = "Torrent has been successfully added: \n\n Hash:" + hash + "\nDownload directory: " + torrentInfo.getDownloadDir();
-            notify(torrentInfo, message);
+            notificationService.notify(torrentInfo.getWatchers(), message);
         }
-
-        return torrentInfoRepository.save(torrentInfoList);
-    }
-
-    private void notify(TorrentInfo torrentInfo, String message) {
-        if (torrentInfo.getWatchers() != null && !torrentInfo.getWatchers().isEmpty()) {
-            for (String w : torrentInfo.getWatchers()) {
-                notificationFacade.sendMessage(w, message);
-            }
-        } else {
-            notificationFacade.sendMessage(DEFAULT_WATCHER, message);
-        }
-    }
-
-    public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) {
-        torrentInfoList.stream()
-                .filter(torrentInfo -> Strings.isNullOrEmpty(torrentInfo.getId()))
-                .forEach(torrentInfo -> {
-                    List<TorrentInfo> byHash = torrentInfoRepository.findByHash(torrentInfo.getHash());
-                    Optional<TorrentInfo> founded = byHash.stream()
-                            .sorted((o1, o2) -> o2.getAdded().compareTo(o1.getAdded()))
-                            .findFirst();
-                    torrentInfo.setId(founded.get().getId());
-                });
 
         return torrentInfoRepository.save(torrentInfoList);
     }
@@ -108,20 +69,23 @@ public class TorrentInfoService {
         return ti;
     }
 
-    public void finish(TorrentInfo torrentInfo) {
-        List<TorrentInfo> byHash = torrentInfoRepository.findByHash(torrentInfo.getHash());
-        Optional<TorrentInfo> founded = byHash.stream()
-                .sorted((o1, o2) -> o2.getAdded().compareTo(o1.getAdded()))
-                .findFirst();
+    public TorrentInfo finish(String hash, String name) {
+        List<TorrentInfo> torrentsByHash = torrentInfoRepository.findByHash(hash);
 
-        if (founded.isPresent()) {
-            founded.get().setFinished(new Date());
-            if (Strings.isNullOrEmpty(founded.get().getName())) {
-                founded.get().setName(torrentInfo.getName());
-            }
-            torrentInfoRepository.save(founded.get());
-            String message = String.format("Torrent downloaded \n\nName: %s \n\nHash: %s", torrentInfo.getName(), torrentInfo.getHash());
-            notify(founded.get(), message);
-        }
+        Optional<TorrentInfo> torrentInfoOptional = torrentsByHash.stream()
+                .filter(t -> t.getFinishDate() == null)
+                .sorted((t1, t2) -> t2.getAddDate().compareTo(t1.getAddDate()))
+                .findFirst();
+        if (!torrentInfoOptional.isPresent()) return null;
+
+        TorrentInfo torrent = torrentInfoOptional.get();
+
+        torrent.setName(name);
+        torrent.setFinishDate(new Date());
+
+        String message = String.format("Torrent downloaded \n\nName: %s \n\nHash: %s", torrent.getName(), torrent.getHash());
+        notificationService.notify(torrent.getWatchers(), message);
+
+        return torrentInfoRepository.save(torrent);
     }
 }

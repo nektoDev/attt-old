@@ -62,7 +62,7 @@ public class TorrentCheckScheduler {
 
                         } else {
 
-                            String error = String.format("Error while add torrent: %s", torrentInfo.getName());
+                            String error = String.format("Error while save torrent: %s", torrentInfo.getName());
                             LOG.error(error);
                             notify(torrentInfo, error);
 
