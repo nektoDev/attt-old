@@ -41,7 +41,14 @@ public class TorrentCheckScheduler {
             String magnet = parser.getMagnetFromUrl(torrentInfo.getUrl());
             torrentInfo.setLastCheckDate(lastCheckDate);
 
-            if (magnet != null && !magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
+            if (magnet == null) {
+                String msg = String.format("Incorrect URL: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
+                LOG.warn(msg);
+                notification.notify(torrentInfo.getWatchers(), msg);
+                continue;
+            }
+
+            if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
 
                 String msg = String.format("New torrent for: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
                 LOG.info(msg);
