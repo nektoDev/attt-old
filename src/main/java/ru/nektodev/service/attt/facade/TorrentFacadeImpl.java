@@ -18,6 +18,7 @@ import java.util.List;
  * @date 16/10/2016
  */
 @RestController()
+@CrossOrigin
 @RequestMapping("/torrent")
 public class TorrentFacadeImpl implements TorrentFacade {
 
