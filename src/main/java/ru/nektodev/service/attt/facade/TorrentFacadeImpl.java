@@ -38,6 +38,15 @@ public class TorrentFacadeImpl implements TorrentFacade {
         return ResponseEntity.ok(service.list());
     }
 
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<TorrentInfo> get(@RequestParam String id) {
+        if (Strings.isNullOrEmpty(id)) {
+            ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(service.get(id));
+    }
+
+
     @Override
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity save(@RequestBody List<TorrentInfo> torrentInfoList) throws IOException {
