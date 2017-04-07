@@ -35,6 +35,10 @@ public class TorrentInfoService {
         return torrentInfoRepository.findAll();
     }
 
+    public TorrentInfo get(String id) {
+        return torrentInfoRepository.findOne(id);
+    }
+
     public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) throws IOException {
         for (TorrentInfo torrentInfo : torrentInfoList) {
             String hash;
@@ -91,4 +95,5 @@ public class TorrentInfoService {
 
         return torrentInfoRepository.save(torrent);
     }
+
 }

@@ -16,6 +16,8 @@ public interface TorrentFacade {
 
     ResponseEntity<List<TorrentInfo>> list();
 
+    ResponseEntity<TorrentInfo> get(@RequestParam(required = true) String id);
+
     ResponseEntity save(List<TorrentInfo> torrentInfoList) throws IOException;
 
     ResponseEntity<TorrentInfo> finalizeTorrent(FinalizeRequest request);
