@@ -47,7 +47,6 @@ public class TorrentFacadeImpl implements TorrentFacade {
         return ResponseEntity.ok(service.get(id));
     }
 
-
     @Override
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity save(@RequestBody List<TorrentInfo> torrentInfoList) throws IOException {
@@ -73,8 +72,15 @@ public class TorrentFacadeImpl implements TorrentFacade {
 
     @Override
     @RequestMapping(method = RequestMethod.GET, path = "/forceCheck")
-    public void forceCheck() throws IOException {
-        torrentChecker.checkTorrent();
+    public ResponseEntity forceCheck(@PathVariable String id) throws IOException {
+        if (Strings.isNullOrEmpty(id)) {
+            return ResponseEntity.ok(torrentChecker.checkTorrents());
+        }
+        TorrentInfo torrentInfo = service.get(id);
+        if (torrentInfo == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(torrentChecker.checkTorrents());
     }
 
     private String validateAddTorrent(List<TorrentInfo> torrentInfoList) {

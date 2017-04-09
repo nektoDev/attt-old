@@ -1,6 +1,7 @@
 package ru.nektodev.service.attt.api;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.nektodev.service.attt.model.FinalizeRequest;
 import ru.nektodev.service.attt.model.TorrentInfo;
@@ -16,7 +17,7 @@ public interface TorrentFacade {
 
     ResponseEntity<List<TorrentInfo>> list();
 
-    ResponseEntity<TorrentInfo> get(@RequestParam(required = true) String id);
+    ResponseEntity<TorrentInfo> get(@PathVariable String id);
 
     ResponseEntity save(List<TorrentInfo> torrentInfoList) throws IOException;
 
@@ -24,5 +25,5 @@ public interface TorrentFacade {
 
     TorrentInfo delete(@RequestParam(required = true) String id);
 
-    void forceCheck() throws IOException;
+    ResponseEntity forceCheck(@PathVariable String id) throws IOException;
 }

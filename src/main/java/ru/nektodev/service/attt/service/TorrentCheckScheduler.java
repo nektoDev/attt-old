@@ -32,38 +32,54 @@ public class TorrentCheckScheduler {
     private NotificationService notification;
 
     @Scheduled(cron = "${scheduler.import.cron}")
-    public void checkTorrent() throws IOException {
+    private void scheduledCheck() throws IOException {
         LOG.info("Start scheduled check.");
+        this.checkTorrents();
+        LOG.info("Scheduled check completed");
+    }
+
+    public String checkTorrents() throws IOException {
         TrackerParser parser = new TrackerParser();
         Date lastCheckDate = new Date();
-
+        StringBuilder result = new StringBuilder();
         for (TorrentInfo torrentInfo : torrentInfoRepository.findByTracked(true)) {
-            String magnet = parser.getMagnetFromUrl(torrentInfo.getUrl());
-            torrentInfo.setLastCheckDate(lastCheckDate);
+            result.append(checkTorrent(parser, lastCheckDate, torrentInfo)).append("\n");
+        }
+        return result.toString();
+    }
 
-            if (magnet == null) {
-                String msg = String.format("Incorrect URL: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
-                LOG.warn(msg);
-                notification.notify(torrentInfo.getWatchers(), msg);
-                continue;
-            }
+    public String checkTorrent(TorrentInfo torrentInfo) throws IOException {
+        return checkTorrent(new TrackerParser(), new Date(), torrentInfo);
+    }
 
-            if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
+    private String checkTorrent(TrackerParser parser, Date lastCheckDate, TorrentInfo torrentInfo) throws IOException {
+        String magnet = parser.getMagnetFromUrl(torrentInfo.getUrl());
+        torrentInfo.setLastCheckDate(lastCheckDate);
+        String msg;
 
-                String msg = String.format("New torrent for: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
-                LOG.info(msg);
-                notification.notify(torrentInfo.getWatchers(), msg);
-
-                torrentInfo = sendToTransmission(torrentInfo, magnet);
-
-            } else {
-                LOG.debug("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
-            }
-
-            torrentInfoRepository.save(Collections.singletonList(torrentInfo));
+        if (magnet == null) {
+            msg = String.format("Incorrect URL: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
+            LOG.warn(msg);
+            notification.notify(torrentInfo.getWatchers(), msg);
+            return msg;
         }
 
-        LOG.info("Scheduled check completed");
+        if (!magnet.equalsIgnoreCase(torrentInfo.getMagnet())) {
+
+            msg = String.format("New torrent for: %s\n %s", torrentInfo.getName(), torrentInfo.getUrl());
+            LOG.info(msg);
+            notification.notify(torrentInfo.getWatchers(), msg);
+
+            torrentInfo = sendToTransmission(torrentInfo, magnet);
+
+        } else {
+            msg = "Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet();
+            LOG.debug("Magnet for " + torrentInfo.getName() + " is the same: " + torrentInfo.getMagnet());
+        }
+
+        torrentInfoRepository.save(Collections.singletonList(torrentInfo));
+
+        return msg;
     }
 
     private TorrentInfo sendToTransmission(TorrentInfo torrentInfo, String magnet) {
