@@ -80,7 +80,7 @@ public class TorrentFacadeImpl implements TorrentFacade {
         if (torrentInfo == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(torrentChecker.checkTorrents());
+        return ResponseEntity.ok(torrentChecker.checkTorrent(torrentInfo));
     }
 
     private String validateAddTorrent(List<TorrentInfo> torrentInfoList) {
