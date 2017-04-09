@@ -71,8 +71,8 @@ public class TorrentFacadeImpl implements TorrentFacade {
     }
 
     @Override
-    @RequestMapping(method = RequestMethod.GET, path = "/forceCheck")
-    public ResponseEntity forceCheck(@PathVariable String id) throws IOException {
+    @RequestMapping(method = RequestMethod.GET, path = "/forceCheck/{id}")
+    public ResponseEntity forceCheck(@PathVariable(required = false) String id) throws IOException {
         if (Strings.isNullOrEmpty(id)) {
             return ResponseEntity.ok(torrentChecker.checkTorrents());
         }
