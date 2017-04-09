@@ -83,6 +83,12 @@ public class TorrentFacadeImpl implements TorrentFacade {
         return ResponseEntity.ok(torrentChecker.checkTorrent(torrentInfo));
     }
 
+    @Override
+    @RequestMapping(method = RequestMethod.GET, path = "/forceCheck")
+    public ResponseEntity forceCheck() throws IOException {
+        return ResponseEntity.ok(torrentChecker.checkTorrents());
+    }
+
     private String validateAddTorrent(List<TorrentInfo> torrentInfoList) {
         StringBuilder result = new StringBuilder();
 
