@@ -8,6 +8,7 @@ import ru.nektodev.service.attt.model.TorrentInfo;
 import ru.nektodev.service.attt.parser.TrackerParser;
 
 import java.io.IOException;
+import java.rmi.NoSuchObjectException;
 import java.util.Collections;
 import java.util.Date;
 
@@ -38,7 +39,15 @@ public class TorrentCheckerService {
         return result.toString();
     }
 
-    public String checkTorrent(TorrentInfo torrentInfo) throws IOException {
+    public String checkTorrent(String id) throws IOException {
+        TorrentInfo torrentInfo = this.torrentInfoService.get(id);
+        if (torrentInfo == null) {
+            throw new NoSuchObjectException("Torrent with id: " + id + "does not exist");
+        }
+        return this.checkTorrent(torrentInfo);
+    }
+
+    private String checkTorrent(TorrentInfo torrentInfo) throws IOException {
         return checkTorrent(new TrackerParser(), new Date(), torrentInfo);
     }
 
