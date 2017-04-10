@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.nektodev.service.attt.api.TorrentFacade;
 import ru.nektodev.service.attt.model.FinalizeRequest;
 import ru.nektodev.service.attt.model.TorrentInfo;
-import ru.nektodev.service.attt.service.TorrentCheckScheduler;
 import ru.nektodev.service.attt.service.TorrentInfoService;
 
 import java.io.IOException;
@@ -28,9 +27,6 @@ public class TorrentFacadeImpl implements TorrentFacade {
 
     @Autowired
     private TorrentInfoService service;
-
-    @Autowired
-    private TorrentCheckScheduler torrentChecker;
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
