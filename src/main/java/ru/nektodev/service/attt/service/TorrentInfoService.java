@@ -35,11 +35,19 @@ public class TorrentInfoService {
         return torrentInfoRepository.findAll();
     }
 
+    public List<TorrentInfo> getAllTracked() {
+        return torrentInfoRepository.findByTracked(true);
+    }
+
     public TorrentInfo get(String id) {
         return torrentInfoRepository.findOne(id);
     }
 
-    public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) throws IOException {
+    public List<TorrentInfo> save(List<TorrentInfo> torrentInfoList) {
+        return torrentInfoRepository.save(torrentInfoList);
+    }
+
+    public List<TorrentInfo> addTorrents(List<TorrentInfo> torrentInfoList) throws IOException {
         for (TorrentInfo torrentInfo : torrentInfoList) {
             String hash;
             if (!Strings.isNullOrEmpty(torrentInfo.getMagnet())) {

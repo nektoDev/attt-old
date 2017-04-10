@@ -55,7 +55,7 @@ public class TorrentFacadeImpl implements TorrentFacade {
             return ResponseEntity.badRequest().body(validateResult);
         }
 
-        return ResponseEntity.ok(service.save(torrentInfoList));
+        return ResponseEntity.ok(service.addTorrents(torrentInfoList));
     }
 
     @Override
