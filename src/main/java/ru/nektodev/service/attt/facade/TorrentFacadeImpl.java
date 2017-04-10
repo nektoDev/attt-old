@@ -70,25 +70,6 @@ public class TorrentFacadeImpl implements TorrentFacade {
         return service.delete(id);
     }
 
-    @Override
-    @RequestMapping(method = RequestMethod.GET, path = "/forceCheck/{id}")
-    public ResponseEntity forceCheck(@PathVariable(required = false) String id) throws IOException {
-        if (Strings.isNullOrEmpty(id)) {
-            return ResponseEntity.ok(torrentChecker.checkTorrents());
-        }
-        TorrentInfo torrentInfo = service.get(id);
-        if (torrentInfo == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(torrentChecker.checkTorrent(torrentInfo));
-    }
-
-    @Override
-    @RequestMapping(method = RequestMethod.GET, path = "/forceCheck")
-    public ResponseEntity forceCheck() throws IOException {
-        return ResponseEntity.ok(torrentChecker.checkTorrents());
-    }
-
     private String validateAddTorrent(List<TorrentInfo> torrentInfoList) {
         StringBuilder result = new StringBuilder();
 

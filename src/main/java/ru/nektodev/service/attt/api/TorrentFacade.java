@@ -24,8 +24,4 @@ public interface TorrentFacade {
     ResponseEntity<TorrentInfo> finalizeTorrent(FinalizeRequest request);
 
     TorrentInfo delete(@RequestParam(required = true) String id);
-
-    ResponseEntity forceCheck(@PathVariable String id) throws IOException;
-
-    ResponseEntity forceCheck() throws IOException;
 }
