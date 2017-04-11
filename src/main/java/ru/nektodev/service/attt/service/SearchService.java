@@ -9,19 +9,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
-import ru.nektodev.service.attt.model.FoundedTorrent;
 import ru.nektodev.service.attt.model.SearchResponse;
+import ru.nektodev.service.attt.parser.TrackerParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author nektodev
@@ -30,12 +25,28 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 
+    private static final String LOGIN_URL = "https://rutracker.org/forum/login.php";
+    private static final String RU_TRACKER_SEARCH_URL = "https://rutracker.org/forum/tracker.php?nm=";
+    private HashMap<String, String> cookies = new HashMap<>();
+
+    public SearchService() {
+        initSession();
+    }
+
     public SearchResponse search(String q) throws IOException {
-        String url = "https://rutracker.org/forum/login.php";
-        String serachurl = "https://rutracker.org/forum/tracker.php?nm=" + q;
+        String searchUrl = RU_TRACKER_SEARCH_URL + q;
+
+        TrackerParser parser = new TrackerParser();
+        SearchResponse response = new SearchResponse();
+        response.setRutracker(parser.parseSearch(searchUrl, cookies));
+
+        return response;
+    }
+
+    private void initSession() {
         CloseableHttpClient client = HttpClients.createDefault();
         try {
-            HttpPost post = new HttpPost(url);
+            HttpPost post = new HttpPost(LOGIN_URL);
 
             List<NameValuePair> urlParameters = new ArrayList<>();
             urlParameters.add(new BasicNameValuePair("login_username", "noctuliuz"));
@@ -46,34 +57,9 @@ public class SearchService {
             HttpResponse response = client.execute(post);
             String session = getSession(response.getHeaders("Set-Cookie"));
 
-            HashMap<String, String> cookie = new HashMap<>();
-            cookie.put("bb_session", session);
-            Document document = Jsoup.connect(serachurl).cookies(cookie).get();
-
-            Element table = document.body().getElementById("tor-tbl");
-            List<Element> elements = table.getElementsByTag("tr").stream()
-                    .filter(element -> element.getElementsByTag("td").size() == 10)
-                    .collect(Collectors.toList());
-
-            List<FoundedTorrent> result = new ArrayList<>();
-            for (Element element : elements) {
-                FoundedTorrent t = new FoundedTorrent();
-                Elements tds = element.getElementsByTag("td");
-
-                System.out.println(tds.get(5).getElementsByTag("u").text());
-
-                t.setCategory(tds.get(2).select("div a").get(0).text());
-                t.setName(tds.get(3).select("div a").get(0).text());
-                t.setId(tds.get(3).select("div a").get(0).attr("data-topic_id"));
-                t.setUrl("http://rutracker.org/forum/" + tds.get(3).select("div a").get(0).attr("href"));
-                t.setSize(Long.parseLong(tds.get(5).getElementsByTag("u").text()));
-                t.setSeeders(Integer.parseInt(tds.get(6).getElementsByTag("u").text()));
-
-                System.out.println(t);
-            }
+            cookies.put("bb_session", session);
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         } finally {
             try {
                 client.close();
@@ -81,8 +67,6 @@ public class SearchService {
                 e.printStackTrace();
             }
         }
-
-        return null;
     }
 
     private String getSession(Header[] headers) {
