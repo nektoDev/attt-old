@@ -30,7 +30,7 @@ public class SearchService {
 
     private static final String LOGIN_URL = "https://rutracker.org/forum/login.php";
     private static final String RU_TRACKER_SEARCH_URL = "https://rutracker.org/forum/tracker.php?nm=";
-    public static final String LOGIN_STRING = "%E2%F5%EE%E4";
+    private static final String LOGIN_STRING = "%E2%F5%EE%E4";
     private HashMap<String, String> cookies = new HashMap<>();
 
     @Value("${rutracker.username}")
@@ -56,13 +56,6 @@ public class SearchService {
         return response;
     }
 
-    private HashMap<String, String> getCookies() {
-        if (!isLoggedIn()) {
-            initSession();
-        }
-        return cookies;
-    }
-
     private boolean isLoggedIn() {
         CloseableHttpClient client = HttpClients.createDefault();
         int statusCode = 200;
@@ -76,13 +69,11 @@ public class SearchService {
             closeClient(client);
         }
 
-        return statusCode != 200 && getCookies() != null && !getCookies().isEmpty();
+        return statusCode != 200 && this.cookies != null && !this.cookies.isEmpty();
     }
 
 
     private void initSession() {
-        System.out.println("Init session");
-
         CloseableHttpClient client = HttpClients.createDefault();
         try {
             HttpPost post = new HttpPost(LOGIN_URL);
