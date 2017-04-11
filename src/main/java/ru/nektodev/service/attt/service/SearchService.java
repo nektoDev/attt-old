@@ -31,12 +31,17 @@ public class SearchService {
     private static final String LOGIN_URL = "https://rutracker.org/forum/login.php";
     private static final String RU_TRACKER_SEARCH_URL = "https://rutracker.org/forum/tracker.php?nm=";
     private static final String LOGIN_STRING = "%E2%F5%EE%E4";
-    private HashMap<String, String> cookies = new HashMap<>();
+    private HashMap<String, String> cookies;
 
     @Value("${rutracker.username}")
     private String username;
     @Value("${rutracker.password}")
     private String password;
+
+    public SearchService() {
+        this.cookies = new HashMap<>();
+        this.cookies.put("bb_session", "");
+    }
 
     public SearchResponse search(String q) throws IOException {
         String searchUrl = RU_TRACKER_SEARCH_URL + q;
