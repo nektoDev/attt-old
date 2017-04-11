@@ -40,12 +40,18 @@ public class TrackerParser {
     public List<FoundedTorrent> parseSearch(String searchUrl, HashMap<String, String> cookie) throws IOException {
         Document document = Jsoup.connect(searchUrl).cookies(cookie).get();
         Element table = document.body().getElementById("tor-tbl");
+        if (table == null) {
+            return null;
+        }
+
         List<Element> elements = table.getElementsByTag("tr").stream()
                 .filter(element -> element.getElementsByTag("td").size() == 10)
                 .collect(Collectors.toList());
+        if (elements == null || elements.isEmpty()) {
+            return null;
+        }
 
         List<FoundedTorrent> result = new ArrayList<>();
-
         for (Element element : elements) {
             Elements tds = element.getElementsByTag("td");
 

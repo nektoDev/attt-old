@@ -1,15 +1,14 @@
 package ru.nektodev.service.attt.service;
 
-import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
+import ru.nektodev.service.attt.model.FoundedTorrent;
 import ru.nektodev.service.attt.model.SearchResponse;
 import ru.nektodev.service.attt.parser.TrackerParser;
 
@@ -29,21 +28,49 @@ public class SearchService {
     private static final String RU_TRACKER_SEARCH_URL = "https://rutracker.org/forum/tracker.php?nm=";
     private HashMap<String, String> cookies = new HashMap<>();
 
-    public SearchService() {
-        initSession();
-    }
-
     public SearchResponse search(String q) throws IOException {
         String searchUrl = RU_TRACKER_SEARCH_URL + q;
 
         TrackerParser parser = new TrackerParser();
         SearchResponse response = new SearchResponse();
-        response.setRutracker(parser.parseSearch(searchUrl, cookies));
+
+        List<FoundedTorrent> rutracker = parser.parseSearch(searchUrl, this.cookies);
+
+        if ((rutracker == null || rutracker.isEmpty()) && !isLoggedIn()) {
+            initSession();
+            rutracker = parser.parseSearch(searchUrl, this.cookies);
+        }
+
+        response.setRutracker(rutracker);
 
         return response;
     }
 
+    private HashMap<String, String> getCookies() {
+        if (!isLoggedIn()) {
+            initSession();
+        }
+        return cookies;
+    }
+
+    private boolean isLoggedIn() {
+        CloseableHttpClient client = HttpClients.createMinimal();
+        int statusCode = 200;
+        try {
+            statusCode = client.execute(new HttpHost(LOGIN_URL), new HttpGet()).getStatusLine().getStatusCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeClient(client);
+        }
+
+        return statusCode != 200 && getCookies() != null && !getCookies().isEmpty();
+    }
+
+
     private void initSession() {
+        System.out.println("Init session");
+
         CloseableHttpClient client = HttpClients.createDefault();
         try {
             HttpPost post = new HttpPost(LOGIN_URL);
@@ -61,11 +88,7 @@ public class SearchService {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                client.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            closeClient(client);
         }
     }
 
@@ -81,5 +104,11 @@ public class SearchService {
         return null;
     }
 
-
+    private void closeClient(CloseableHttpClient client) {
+        try {
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
