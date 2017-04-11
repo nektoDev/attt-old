@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.nektodev.service.attt.model.FoundedTorrent;
 import ru.nektodev.service.attt.model.SearchResponse;
@@ -29,7 +30,13 @@ public class SearchService {
 
     private static final String LOGIN_URL = "https://rutracker.org/forum/login.php";
     private static final String RU_TRACKER_SEARCH_URL = "https://rutracker.org/forum/tracker.php?nm=";
+    public static final String LOGIN_STRING = "%E2%F5%EE%E4";
     private HashMap<String, String> cookies = new HashMap<>();
+
+    @Value("${rutracker.username}")
+    private String username;
+    @Value("${rutracker.password}")
+    private String password;
 
     public SearchResponse search(String q) throws IOException {
         String searchUrl = RU_TRACKER_SEARCH_URL + q;
@@ -81,9 +88,9 @@ public class SearchService {
             HttpPost post = new HttpPost(LOGIN_URL);
 
             List<NameValuePair> urlParameters = new ArrayList<>();
-            urlParameters.add(new BasicNameValuePair("login_username", "noctuliuz"));
-            urlParameters.add(new BasicNameValuePair("login_password", "kHS4m@T9!f3lv"));
-            urlParameters.add(new BasicNameValuePair("login", "%E2%F5%EE%E4"));
+            urlParameters.add(new BasicNameValuePair("login_username", username));
+            urlParameters.add(new BasicNameValuePair("login_password", password));
+            urlParameters.add(new BasicNameValuePair("login", LOGIN_STRING));
             post.setEntity(new UrlEncodedFormEntity(urlParameters));
 
             HttpResponse response = client.execute(post);
