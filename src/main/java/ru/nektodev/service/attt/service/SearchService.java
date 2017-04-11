@@ -1,6 +1,9 @@
 package ru.nektodev.service.attt.service;
 
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -54,10 +57,12 @@ public class SearchService {
     }
 
     private boolean isLoggedIn() {
-        CloseableHttpClient client = HttpClients.createMinimal();
+        CloseableHttpClient client = HttpClients.createDefault();
         int statusCode = 200;
         try {
-            statusCode = client.execute(new HttpHost(LOGIN_URL), new HttpGet()).getStatusLine().getStatusCode();
+            HttpGet request = new HttpGet("https://rutracker.org/forum/login.php");
+            request.setHeader("Cookie", "bb_session=" + cookies.get("bb_session"));
+            statusCode = client.execute(request).getStatusLine().getStatusCode();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
