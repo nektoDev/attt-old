@@ -79,6 +79,7 @@ public class SearchService {
 
 
     private void initSession() {
+        System.out.println("Init session");
         CloseableHttpClient client = HttpClients.createDefault();
         try {
             HttpPost post = new HttpPost(LOGIN_URL);
@@ -91,8 +92,9 @@ public class SearchService {
 
             HttpResponse response = client.execute(post);
             String session = getSession(response.getHeaders("Set-Cookie"));
-
-            cookies.put("bb_session", session);
+            if (session != null) {
+                cookies.put("bb_session", session);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
