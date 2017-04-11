@@ -92,6 +92,7 @@ public class SearchService {
 
             HttpResponse response = client.execute(post);
             String session = getSession(response.getHeaders("Set-Cookie"));
+            System.out.println(response);
             if (session != null) {
                 cookies.put("bb_session", session);
             }
